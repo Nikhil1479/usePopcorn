@@ -1,3 +1,4 @@
+// Importing Necessary Libraries
 import { useEffect, useState } from "react";
 import { tempMovieData } from "./MovieData";
 import { tempWatchedData } from "./MovieData";
