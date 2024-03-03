@@ -20,7 +20,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const query = "pk";
+  const query = "Interstellar";
   const APIKEY = "8c757fb";
 
   // Fetching Movie Data using useEffect.
