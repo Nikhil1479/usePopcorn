@@ -70,9 +70,8 @@ body {
   border-radius: 0.9rem;
   overflow: scroll;
   position: relative;
-    overflow: hidden; /* Hide scrollbars */
-  overflow-y: hidden; /* Hide vertical scrollbar */
-  overflow-x: hidden;
+   /* overflow-y: hidden;   */
+  overflow-x: hidden;  
 }
 
 .loader {
@@ -156,9 +155,9 @@ body {
   list-style: none;
   padding: 0.8rem 0;
   overflow: scroll;
-    overflow: hidden; /* Hide scrollbars */
-  overflow-y: hidden; /* Hide vertical scrollbar */
-  overflow-x: hidden;
+  overflow: hidden; 
+  overflow-y: hidden;
+  overflow-x: hidden;  
 }
 
 .list-watched {
