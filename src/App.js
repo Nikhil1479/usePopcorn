@@ -22,7 +22,6 @@ export default function App() {
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
 
-  const tempQuery = "Interstellar";
   const APIKEY = "8c757fb";
 
   // Fetching Movie Data using useEffect.
