@@ -123,13 +123,13 @@ function MovieDetails({ selectedID, onClosebtn }) {
   const [movieDetail, setMovieDetail] = useState({});
   const {
     Title: title,
-    Year: year,
-    Rated: rated,
+    // Year: year,
+    // Rated: rated,
     Plot: plot,
     Director: director,
     Genre: genre,
     Released: released,
-    Language: language,
+    // Language: language,
     Poster: poster,
     imdbRating,
     Runtime: runtime,
