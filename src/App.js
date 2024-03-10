@@ -31,6 +31,9 @@ export default function App() {
   function handleSelectedMovie(id) {
     setSelectedMovie(selectedMovie === id ? null : id);
   }
+  function handleAddMovie(newMovie) {
+    setWatched((watched) => [...watched, newMovie]);
+  }
   // Fetching Movie Data using useEffect.
   useEffect(() => {
     async function fetchMovies() {
@@ -107,6 +110,7 @@ export default function App() {
             <MovieDetails
               selectedID={selectedMovie}
               onClosebtn={handleClosebtn}
+              onAddMovie={handleAddMovie}
             />
           ) : (
             <>
@@ -119,8 +123,9 @@ export default function App() {
     </>
   );
 }
-function MovieDetails({ selectedID, onClosebtn }) {
+function MovieDetails({ selectedID, onClosebtn, onAddMovie }) {
   const [movieDetail, setMovieDetail] = useState({});
+  const [movieRating, setMovieRating] = useState();
   const {
     Title: title,
     // Year: year,
@@ -135,6 +140,21 @@ function MovieDetails({ selectedID, onClosebtn }) {
     Runtime: runtime,
     Actors: actors,
   } = movieDetail;
+
+  function handleAddMovie() {
+    const newMovie = {
+      imdbID: selectedID,
+      poster,
+      title,
+      runtime: Number(runtime.split(" ")[0]),
+      imdbRating,
+      userRating: movieRating,
+    };
+    console.log(newMovie);
+
+    onAddMovie(newMovie);
+    onClosebtn();
+  }
 
   useEffect(() => {
     async function fetchMovieDetails() {
@@ -151,10 +171,16 @@ function MovieDetails({ selectedID, onClosebtn }) {
     }
     fetchMovieDetails();
   }, [selectedID]);
-
+  // function onAddMovie() {
+  //   const newMovie = {
+  //     imdbID: selectedID,
+  //     poster,
+  //     Title: title,
+  //   };
+  // }
   return (
     <div className="details">
-      <header className="">
+      <header>
         <button className="btn-back" onClick={onClosebtn}>
           <FontAwesomeIcon icon="fa-solid fa-angle-left" />{" "}
         </button>
@@ -172,7 +198,21 @@ function MovieDetails({ selectedID, onClosebtn }) {
         </div>
       </header>
       <section>
-        <StarRating maxRating={10} size={24} />
+        <div className="rating">
+          <StarRating
+            maxRating={10}
+            size={21}
+            defaultRating={0}
+            onSetRating={setMovieRating}
+          />
+          <p>{movieRating ? `This movie is rated ${movieRating}` : ""}</p>
+          {movieRating > 0 && (
+            <button className="btn-add" onClick={() => handleAddMovie()}>
+              {" "}
+              + Add To List
+            </button>
+          )}
+        </div>
         <p>
           <em>{plot}</em>
         </p>
@@ -267,8 +307,8 @@ function WatchedMovieList({ watched }) {
 function WatchedMovie({ movie }) {
   return (
     <li key={movie.imdbID}>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
+      <img src={movie.poster} alt={`${movie.title} poster`} />
+      <h3>{movie.title}</h3>
       <div>
         <p>
           <span>⭐️</span>

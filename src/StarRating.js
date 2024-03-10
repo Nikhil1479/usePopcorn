@@ -1,12 +1,5 @@
 import { useState } from "react";
 
-const starStyle = {
-  height: "48px",
-  width: "48px",
-  display: "block",
-  cursor: "pointer",
-};
-
 const containerStyle = {
   display: "flex",
   alignItems: "center",
@@ -16,16 +9,20 @@ export default function StarRating({
   maxRating = 5,
   color = "#fcc419",
   size = 48,
-  className = "",
+  className = containerStyle,
   messages = [],
   defaultRating = 0,
-  setMovieRating,
+  onSetRating,
 }) {
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(defaultRating);
   const [tempRating, setTempRating] = useState(0);
 
   function handleSetRating(rating) {
     setRating(() => rating);
+
+    // Setting value external state rating
+    // if (setMovieRating) {
+    onSetRating(rating);
   }
 
   function handleHoverIN(tempRating) {
@@ -37,7 +34,7 @@ export default function StarRating({
   }
 
   return (
-    <div style={containerStyle}>
+    <div style={className}>
       {Array.from({ length: maxRating }, (_, i) => (
         <Star
           key={i}
@@ -46,15 +43,24 @@ export default function StarRating({
           onHoverIn={() => handleHoverIN(i + 1)}
           onHoverOut={() => handleHoverOut()}
           color={color}
+          size={size}
         />
       ))}
-      {/* Count of Stars */}
-      {/* <p> {tempRating ? tempRating : rating} </p> */}
+      <p style={{ color: "#fcc419" }}> {tempRating ? tempRating : rating} </p>
+      <p style={{ color: "#fcc419" }}>
+        {messages[tempRating ? tempRating : rating]}
+      </p>
     </div>
   );
 }
 
-function Star({ full, onRate, onHoverIn, onHoverOut, color }) {
+function Star({ full, onRate, onHoverIn, onHoverOut, color, size }) {
+  const starStyle = {
+    height: size,
+    width: size,
+    display: "block",
+    cursor: "pointer",
+  };
   return (
     <span
       style={starStyle}
