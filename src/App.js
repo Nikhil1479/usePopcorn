@@ -50,6 +50,7 @@ export default function App() {
 
   // Fetching Movie Data using useEffect hook
   useEffect(() => {
+    const controller = new AbortController();
     // Async function to fetch movies
     async function fetchMovies() {
       try {
@@ -58,7 +59,8 @@ export default function App() {
 
         const res = await fetch(
           // Fetch movie data from OMDB API
-          `https://www.omdbapi.com/?s=${query}&apikey=${APIKEY}`
+          `https://www.omdbapi.com/?s=${query}&apikey=${APIKEY}`,
+          { signal: controller.signal }
         );
         const data = await res.json(); // Parse response to JSON
         // console.log(data);
@@ -74,9 +76,10 @@ export default function App() {
         if (err.message === "Failed to fetch") {
           setError("Something Went Wrong..."); // Set error message for failed fetch
           // console.error(err.message);
+        } else if (err.name === "AbortError") {
+          console.log("User Aborted"); // Ignoring the Abort Error
         } else {
           setError(err.message); // Set error message for other errors
-          // console.error(err.message);
         }
       } finally {
         setIsLoading(false); // Set loading status to false
@@ -89,6 +92,10 @@ export default function App() {
       return;
     }
     fetchMovies(); // Call fetchMovies function
+
+    return function () {
+      controller.abort();
+    };
   }, [query]); // useEffect dependency on query state
 
   // JSX structure for rendering App component
