@@ -43,6 +43,11 @@ export default function App() {
     setWatched((watched) => [...watched, newMovie]);
   }
 
+  // Function to handle deleting a movie from watched list
+  function handleDeleteWatched(id) {
+    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
+  }
+
   // Fetching Movie Data using useEffect hook
   useEffect(() => {
     // Async function to fetch movies
@@ -134,7 +139,10 @@ export default function App() {
             <>
               {/* Render Summary and WatchedMovieList components if no movie is selected */}
               <Summary watched={watched} />
-              <WatchedMovieList watched={watched} />
+              <WatchedMovieList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
             </>
           )}
         </Box>
@@ -147,7 +155,7 @@ export default function App() {
 function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
   // useState hook for managing component state
   const [movieDetail, setMovieDetail] = useState({}); // State for movie details
-  const [userRating, setUserRating] = useState(); // State for user rating
+  const [userRating, setUserRating] = useState(0); // State for user rating
 
   // Destructuring movieDetail object
   const {
@@ -179,6 +187,11 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
 
   // Check if movie is already in watched list
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedID);
+
+  //This line of code retrieves the user rating of a specific movie from the watched list, if it exists, based on its IMDb ID.
+  const selectedMovieUserRating = watched.find(
+    (movie) => movie.imdbID === selectedID
+  )?.userRating;
 
   // useEffect hook to fetch movie details
   useEffect(() => {
@@ -221,23 +234,24 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
       </header>
       <section>
         <div className="rating">
-          <StarRating
-            maxRating={10}
-            size={21}
-            defaultRating={0}
-            onSetRating={setUserRating}
-          />
-          <p>{userRating ? `This movie is rated ${userRating}` : ""}</p>
-          {/* Button to add movie to watched list */}
           {!isWatched ? (
-            <button className="btn-add" onClick={() => handleAddMovie()}>
-              {" "}
-              + Add To List
-            </button>
+            <>
+              <StarRating
+                maxRating={10}
+                size={21}
+                defaultRating={0}
+                onSetRating={setUserRating}
+              />
+              <p>{userRating ? `This movie is rated ${userRating}` : ""}</p>
+
+              {/* Button to add movie to watched list */}
+              <button className="btn-add" onClick={() => handleAddMovie()}>
+                {" "}
+                + Add To List
+              </button>
+            </>
           ) : (
-            <button className="btn-add" disabled>
-              Already Added
-            </button>
+            <p>You rated movie {selectedMovieUserRating} </p>
           )}
         </div>
         <p>
@@ -332,19 +346,23 @@ function Movie({ movie, handleSelectedMovie }) {
 }
 
 // Function component for rendering list of watched movies
-function WatchedMovieList({ watched }) {
+function WatchedMovieList({ watched, onDeleteWatched }) {
   // JSX structure for rendering WatchedMovieList component
   return (
     <ul className="list">
       {watched.map((movie) => (
-        <WatchedMovie key={movie.imdbID} movie={movie} />
+        <WatchedMovie
+          key={movie.imdbID}
+          movie={movie}
+          onDeleteWatched={onDeleteWatched}
+        />
       ))}
     </ul>
   );
 }
 
 // Function component for rendering individual watched movie
-function WatchedMovie({ movie }) {
+function WatchedMovie({ movie, onDeleteWatched }) {
   // JSX structure for rendering WatchedMovie component
   return (
     <li key={movie.imdbID}>
@@ -363,6 +381,12 @@ function WatchedMovie({ movie }) {
           <span>⏳</span>
           <span>{movie.runtime} min</span>
         </p>
+        <button
+          className="btn-delete"
+          onClick={() => onDeleteWatched(movie.imdbID)}
+        >
+          <FontAwesomeIcon icon="fa-solid fa-xmark" />
+        </button>
       </div>
     </li>
   );
