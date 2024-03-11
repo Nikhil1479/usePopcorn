@@ -50,6 +50,7 @@ export default function App() {
 
   // Fetching Movie Data using useEffect hook
   useEffect(() => {
+    const controller = new AbortController();
     // Async function to fetch movies
     async function fetchMovies() {
       try {
@@ -58,7 +59,8 @@ export default function App() {
 
         const res = await fetch(
           // Fetch movie data from OMDB API
-          `https://www.omdbapi.com/?s=${query}&apikey=${APIKEY}`
+          `https://www.omdbapi.com/?s=${query}&apikey=${APIKEY}`,
+          { signal: controller.signal }
         );
         const data = await res.json(); // Parse response to JSON
         // console.log(data);
@@ -74,9 +76,10 @@ export default function App() {
         if (err.message === "Failed to fetch") {
           setError("Something Went Wrong..."); // Set error message for failed fetch
           // console.error(err.message);
+        } else if (err.name === "AbortError") {
+          console.log("User Aborted"); // Ignoring the Abort Error
         } else {
           setError(err.message); // Set error message for other errors
-          // console.error(err.message);
         }
       } finally {
         setIsLoading(false); // Set loading status to false
@@ -88,7 +91,12 @@ export default function App() {
       setError(null); // Clear any previous error
       return;
     }
+    handleClosebtn();
     fetchMovies(); // Call fetchMovies function
+
+    return function () {
+      controller.abort();
+    };
   }, [query]); // useEffect dependency on query state
 
   // JSX structure for rendering App component
@@ -130,6 +138,7 @@ export default function App() {
           {/* Render MovieDetails component if movie is selected */}
           {selectedMovie ? (
             <MovieDetails
+              key={selectedMovie}
               selectedID={selectedMovie}
               onClosebtn={handleClosebtn}
               onAddMovie={handleAddMovie}
@@ -211,6 +220,42 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
     }
     fetchMovieDetails(); // Call fetchMovieDetails function
   }, [selectedID]); // useEffect dependency on selectedID state
+
+  // useEffect hook to change webpage title based on the selected movie
+  /* The above code is a React useEffect hook that sets the document title to "Movie | {title}" when
+  the title variable is truthy. It also returns a cleanup function that resets the document title to
+  "usePopcorn" when the component unmounts or when the title variable changes. The useEffect hook
+  will run whenever the title variable changes. */
+  useEffect(() => {
+    if (!title) return;
+    document.title = `Movie | ${title}`;
+
+    // cleanup function that resets the document title to "usePopcorn" when the component unmounts or when the title variable changes.
+    return function () {
+      document.title = "usePopcorn";
+    };
+  }, [title]);
+
+  /* The below code is a React useEffect hook that adds an event listener for the "keydown" event on the
+document. When a key is pressed, it checks if the key code is "Escape". If the Escape key is
+pressed, it calls the onClosebtn function and logs "closing" to the console. The useEffect hook also
+returns a cleanup function that removes the event listener when the component unmounts or when the
+onClosebtn function changes. */
+  useEffect(() => {
+    function callback(e) {
+      if (e.code === "Escape") {
+        onClosebtn();
+        console.log("closing");
+      }
+    }
+    // Attaching Event Listener
+    document.addEventListener("keydown", callback);
+
+    // Cleanup Function to remove Event Listener
+    return function () {
+      document.removeEventListener("keydown", callback);
+    };
+  }, [onClosebtn]);
 
   // JSX structure for rendering MovieDetails component
   return (
@@ -414,15 +459,15 @@ function Summary({ watched }) {
         </p>
         <p>
           <span>⭐️</span>
-          <span>{avgImdbRating}</span>
+          <span>{avgImdbRating.toFixed(2)}</span>
         </p>
         <p>
           <span>🌟</span>
-          <span>{avgUserRating}</span>
+          <span>{avgUserRating.toFixed(2)}</span>
         </p>
         <p>
           <span>⏳</span>
-          <span>{avgRuntime} min</span>
+          <span>{avgRuntime.toFixed(2)} min</span>
         </p>
       </div>
     </div>
