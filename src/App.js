@@ -212,6 +212,21 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
     fetchMovieDetails(); // Call fetchMovieDetails function
   }, [selectedID]); // useEffect dependency on selectedID state
 
+  // useEffect hook to change webpage title based on the selected movie
+  /* The above code is a React useEffect hook that sets the document title to "Movie | {title}" when
+  the title variable is truthy. It also returns a cleanup function that resets the document title to
+  "usePopcorn" when the component unmounts or when the title variable changes. The useEffect hook
+  will run whenever the title variable changes. */
+  useEffect(() => {
+    if (!title) return;
+    document.title = `Movie | ${title}`;
+
+    // cleanup function that resets the document title to "usePopcorn" when the component unmounts or when the title variable changes.
+    return function () {
+      document.title = "usePopcorn";
+    };
+  }, [title]);
+
   // JSX structure for rendering MovieDetails component
   return (
     <div className="details">
