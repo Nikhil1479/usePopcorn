@@ -91,6 +91,7 @@ export default function App() {
       setError(null); // Clear any previous error
       return;
     }
+    handleClosebtn();
     fetchMovies(); // Call fetchMovies function
 
     return function () {
@@ -137,6 +138,7 @@ export default function App() {
           {/* Render MovieDetails component if movie is selected */}
           {selectedMovie ? (
             <MovieDetails
+              key={selectedMovie}
               selectedID={selectedMovie}
               onClosebtn={handleClosebtn}
               onAddMovie={handleAddMovie}
@@ -233,6 +235,27 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
       document.title = "usePopcorn";
     };
   }, [title]);
+
+  /* The below code is a React useEffect hook that adds an event listener for the "keydown" event on the
+document. When a key is pressed, it checks if the key code is "Escape". If the Escape key is
+pressed, it calls the onClosebtn function and logs "closing" to the console. The useEffect hook also
+returns a cleanup function that removes the event listener when the component unmounts or when the
+onClosebtn function changes. */
+  useEffect(() => {
+    function callback(e) {
+      if (e.code === "Escape") {
+        onClosebtn();
+        console.log("closing");
+      }
+    }
+    // Attaching Event Listener
+    document.addEventListener("keydown", callback);
+
+    // Cleanup Function to remove Event Listener
+    return function () {
+      document.removeEventListener("keydown", callback);
+    };
+  }, [onClosebtn]);
 
   // JSX structure for rendering MovieDetails component
   return (
