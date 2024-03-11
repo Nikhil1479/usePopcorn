@@ -1,96 +1,112 @@
 // Importing Necessary Libraries
-import { useEffect, useState } from "react";
-import { tempMovieData } from "./MovieData";
-import { tempWatchedData } from "./MovieData";
-import StarRating from "./StarRating";
+import { useEffect, useState } from "react"; // Importing React hooks for component lifecycle management
+import { tempMovieData } from "./MovieData"; // Importing temporary movie data
+import { tempWatchedData } from "./MovieData"; // Importing temporary watched movie data
+import StarRating from "./StarRating"; // Importing StarRating component
 
 // Importing Font Awesmome React Component
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Importing FontAwesomeIcon component
 
-// Importing FontAwesome Globaally
-import { library } from "@fortawesome/fontawesome-svg-core";
+// Importing FontAwesome Globally
+import { library } from "@fortawesome/fontawesome-svg-core"; // Importing library for FontAwesome icons
 
 // import your icons
-import { fab } from "@fortawesome/free-brands-svg-icons";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { far } from "@fortawesome/free-regular-svg-icons";
-library.add(fab, fas, far);
-const APIKEY = "8c757fb";
+import { fab } from "@fortawesome/free-brands-svg-icons"; // Importing FontAwesome brands icons
+import { fas } from "@fortawesome/free-solid-svg-icons"; // Importing FontAwesome solid icons
+import { far } from "@fortawesome/free-regular-svg-icons"; // Importing FontAwesome regular icons
+library.add(fab, fas, far); // Adding imported icons to the library
 
+const APIKEY = "8c757fb"; // API key for OMDB API
+
+// Exporting default function component named App
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [query, setQuery] = useState("");
-  const [selectedMovie, setSelectedMovie] = useState(null);
+  // useState hooks for managing component state
+  const [movies, setMovies] = useState(tempMovieData); // State for storing movie data
+  const [watched, setWatched] = useState(tempWatchedData); // State for storing watched movies
+  const [isLoading, setIsLoading] = useState(false); // State for loading status
+  const [error, setError] = useState(null); // State for error handling
+  const [query, setQuery] = useState(""); // State for search query
+  const [selectedMovie, setSelectedMovie] = useState(null); // State for selected movie details
 
+  // Function to close selected movie details
   function handleClosebtn() {
     setSelectedMovie(null);
   }
+
+  // Function to handle selecting a movie and toggling its details
   function handleSelectedMovie(id) {
     setSelectedMovie(selectedMovie === id ? null : id);
   }
+
+  // Function to handle adding a new movie to the watched list
   function handleAddMovie(newMovie) {
     setWatched((watched) => [...watched, newMovie]);
   }
-  // Fetching Movie Data using useEffect.
+
+  // Fetching Movie Data using useEffect hook
   useEffect(() => {
+    // Async function to fetch movies
     async function fetchMovies() {
       try {
-        setIsLoading(true);
-        setError(null);
+        setIsLoading(true); // Set loading status to true
+        setError(null); // Clear any previous error
 
         const res = await fetch(
+          // Fetch movie data from OMDB API
           `https://www.omdbapi.com/?s=${query}&apikey=${APIKEY}`
         );
-        const data = await res.json();
+        const data = await res.json(); // Parse response to JSON
         // console.log(data);
         //
         if (data.Response === "False") {
-          throw new Error(data.Error);
+          throw new Error(data.Error); // Throw error if response is false
         }
 
-        setMovies(data.Search);
-        setWatched(tempWatchedData);
-        setIsLoading(false);
+        setMovies(data.Search); // Set fetched movies to state
+        setWatched(tempWatchedData); // Reset watched movies data
+        setIsLoading(false); // Set loading status to false
       } catch (err) {
         if (err.message === "Failed to fetch") {
-          setError("Something Went Wrong...");
+          setError("Something Went Wrong..."); // Set error message for failed fetch
           // console.error(err.message);
         } else {
-          setError(err.message);
+          setError(err.message); // Set error message for other errors
           // console.error(err.message);
         }
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Set loading status to false
         // setError(null);
       }
     }
     if (query.length < 3) {
-      setMovies([]);
-      setError(null);
+      setMovies([]); // Clear movies data if query length is less than 3
+      setError(null); // Clear any previous error
       return;
     }
-    fetchMovies();
-  }, [query]);
+    fetchMovies(); // Call fetchMovies function
+  }, [query]); // useEffect dependency on query state
 
+  // JSX structure for rendering App component
   return (
     <>
+      {/* Navbar component */}
       <Navbar>
-        <Logo />
-        <Search query={query} setQuery={setQuery} />
-        <NumResults movies={movies} />
+        <Logo /> {/* Logo component */}
+        <Search query={query} setQuery={setQuery} /> {/* Search component */}
+        <NumResults movies={movies} /> {/* NumResults component */}
       </Navbar>
 
+      {/* Main component */}
       <Main>
         <Box>
+          {/* Render MovieList component if not loading and no error */}
           {!isLoading && !error && (
             <MovieList
               movies={movies}
               handleSelectedMovie={handleSelectedMovie}
             />
           )}
+          {/* Render ErrorMessage component if error */}
           {error && (
             <ErrorMessage
               message={error}
@@ -101,19 +117,22 @@ export default function App() {
               }
             />
           )}
+          {/* Render Loader component if loading */}
           {isLoading && <Loader faicon="fa-solid fa-spinner" toSpin={true} />}
-          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
         </Box>
 
         <Box>
+          {/* Render MovieDetails component if movie is selected */}
           {selectedMovie ? (
             <MovieDetails
               selectedID={selectedMovie}
               onClosebtn={handleClosebtn}
               onAddMovie={handleAddMovie}
+              watched={watched}
             />
           ) : (
             <>
+              {/* Render Summary and WatchedMovieList components if no movie is selected */}
               <Summary watched={watched} />
               <WatchedMovieList watched={watched} />
             </>
@@ -123,24 +142,27 @@ export default function App() {
     </>
   );
 }
-function MovieDetails({ selectedID, onClosebtn, onAddMovie }) {
-  const [movieDetail, setMovieDetail] = useState({});
-  const [movieRating, setMovieRating] = useState();
+
+// Function component for rendering movie details
+function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
+  // useState hook for managing component state
+  const [movieDetail, setMovieDetail] = useState({}); // State for movie details
+  const [userRating, setUserRating] = useState(); // State for user rating
+
+  // Destructuring movieDetail object
   const {
     Title: title,
-    // Year: year,
-    // Rated: rated,
     Plot: plot,
     Director: director,
     Genre: genre,
     Released: released,
-    // Language: language,
     Poster: poster,
     imdbRating,
     Runtime: runtime,
     Actors: actors,
   } = movieDetail;
 
+  // Function to handle adding movie to watched list
   function handleAddMovie() {
     const newMovie = {
       imdbID: selectedID,
@@ -148,36 +170,36 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie }) {
       title,
       runtime: Number(runtime.split(" ")[0]),
       imdbRating,
-      userRating: movieRating,
+      userRating: userRating,
     };
     console.log(newMovie);
-
-    onAddMovie(newMovie);
-    onClosebtn();
+    onAddMovie(newMovie); // Call onAddMovie function to add movie to watched list
+    onClosebtn(); // Close movie details
   }
 
+  // Check if movie is already in watched list
+  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedID);
+
+  // useEffect hook to fetch movie details
   useEffect(() => {
+    // Async function to fetch movie details
     async function fetchMovieDetails() {
       try {
         const res = await fetch(
+          // Fetch movie details from OMDB API
           `https://www.omdbapi.com/?i=${selectedID}&apikey=${APIKEY}`
         );
-        const data = await res.json();
+        const data = await res.json(); // Parse response to JSON
         console.log(data);
-        setMovieDetail(data);
+        setMovieDetail(data); // Set fetched movie details to state
       } catch (e) {
         console.log(e.message);
       }
     }
-    fetchMovieDetails();
-  }, [selectedID]);
-  // function onAddMovie() {
-  //   const newMovie = {
-  //     imdbID: selectedID,
-  //     poster,
-  //     Title: title,
-  //   };
-  // }
+    fetchMovieDetails(); // Call fetchMovieDetails function
+  }, [selectedID]); // useEffect dependency on selectedID state
+
+  // JSX structure for rendering MovieDetails component
   return (
     <div className="details">
       <header>
@@ -203,13 +225,18 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie }) {
             maxRating={10}
             size={21}
             defaultRating={0}
-            onSetRating={setMovieRating}
+            onSetRating={setUserRating}
           />
-          <p>{movieRating ? `This movie is rated ${movieRating}` : ""}</p>
-          {movieRating > 0 && (
+          <p>{userRating ? `This movie is rated ${userRating}` : ""}</p>
+          {/* Button to add movie to watched list */}
+          {!isWatched ? (
             <button className="btn-add" onClick={() => handleAddMovie()}>
               {" "}
               + Add To List
+            </button>
+          ) : (
+            <button className="btn-add" disabled>
+              Already Added
             </button>
           )}
         </div>
@@ -223,6 +250,7 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie }) {
   );
 }
 
+// Function component for rendering error message
 function ErrorMessage({ message, faicon = "fa-solid fa-circle-exclamation" }) {
   return (
     <p className="error">
@@ -234,6 +262,7 @@ function ErrorMessage({ message, faicon = "fa-solid fa-circle-exclamation" }) {
   );
 }
 
+// Function component for rendering loader
 function Loader({ faicon = "fa-solid fa-spinner", toSpin = true }) {
   return (
     <p className="loader">
@@ -245,13 +274,17 @@ function Loader({ faicon = "fa-solid fa-spinner", toSpin = true }) {
     </p>
   );
 }
-function Main({ movies, watched, children }) {
+
+// Function component for rendering main content
+function Main({ children }) {
   return <main className="main">{children}</main>;
 }
 
+// Function component for rendering collapsible box
 function Box({ children }) {
-  const [isOpen1, setIsOpen1] = useState(true);
+  const [isOpen1, setIsOpen1] = useState(true); // useState hook for managing component state
 
+  // JSX structure for rendering Box component
   return (
     <div className="box">
       <button
@@ -265,7 +298,9 @@ function Box({ children }) {
   );
 }
 
+// Function component for rendering list of movies
 function MovieList({ movies, handleSelectedMovie }) {
+  // JSX structure for rendering MovieList component
   return (
     <ul className="list list-movies">
       {movies?.map((movie) => (
@@ -279,7 +314,9 @@ function MovieList({ movies, handleSelectedMovie }) {
   );
 }
 
+// Function component for rendering individual movie
 function Movie({ movie, handleSelectedMovie }) {
+  // JSX structure for rendering Movie component
   return (
     <li key={movie.imdbID} onClick={() => handleSelectedMovie(movie.imdbID)}>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
@@ -294,7 +331,9 @@ function Movie({ movie, handleSelectedMovie }) {
   );
 }
 
+// Function component for rendering list of watched movies
 function WatchedMovieList({ watched }) {
+  // JSX structure for rendering WatchedMovieList component
   return (
     <ul className="list">
       {watched.map((movie) => (
@@ -304,7 +343,9 @@ function WatchedMovieList({ watched }) {
   );
 }
 
+// Function component for rendering individual watched movie
 function WatchedMovie({ movie }) {
+  // JSX structure for rendering WatchedMovie component
   return (
     <li key={movie.imdbID}>
       <img src={movie.poster} alt={`${movie.title} poster`} />
@@ -326,13 +367,19 @@ function WatchedMovie({ movie }) {
     </li>
   );
 }
+
+// Function component for rendering summary of watched movies
 function Summary({ watched }) {
+  // Function to calculate average of an array
   const average = (arr) =>
     arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
+
+  // Calculating average IMDb rating, user rating, and runtime of watched movies
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
   const avgUserRating = average(watched.map((movie) => movie.userRating));
   const avgRuntime = average(watched.map((movie) => movie.runtime));
 
+  // JSX structure for rendering Summary component
   return (
     <div className="summary">
       <h2>Movies you watched</h2>
@@ -358,7 +405,9 @@ function Summary({ watched }) {
   );
 }
 
+// Function component for rendering logo
 function Logo() {
+  // JSX structure for rendering Logo component
   return (
     <div className="logo">
       <span role="img">🍿</span>
@@ -367,14 +416,19 @@ function Logo() {
   );
 }
 
+// Function component for rendering number of search results
 function NumResults({ movies }) {
+  // JSX structure for rendering NumResults component
   return (
     <p className="num-results">
       Found <strong>{movies.length}</strong> results
     </p>
   );
 }
+
+// Function component for rendering search input
 function Search({ query, setQuery }) {
+  // JSX structure for rendering Search component
   return (
     <input
       className="search"
@@ -386,6 +440,8 @@ function Search({ query, setQuery }) {
   );
 }
 
+// Function component for rendering navigation bar
 function Navbar({ children }) {
+  // JSX structure for rendering Navbar component
   return <nav className="nav-bar">{children}</nav>;
 }
