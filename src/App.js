@@ -147,7 +147,7 @@ export default function App() {
 function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
   // useState hook for managing component state
   const [movieDetail, setMovieDetail] = useState({}); // State for movie details
-  const [userRating, setUserRating] = useState(); // State for user rating
+  const [userRating, setUserRating] = useState(0); // State for user rating
 
   // Destructuring movieDetail object
   const {
@@ -179,6 +179,11 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
 
   // Check if movie is already in watched list
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedID);
+
+  //This line of code retrieves the user rating of a specific movie from the watched list, if it exists, based on its IMDb ID.
+  const selectedMovieUserRating = watched.find(
+    (movie) => movie.imdbID === selectedID
+  )?.userRating;
 
   // useEffect hook to fetch movie details
   useEffect(() => {
@@ -221,23 +226,24 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
       </header>
       <section>
         <div className="rating">
-          <StarRating
-            maxRating={10}
-            size={21}
-            defaultRating={0}
-            onSetRating={setUserRating}
-          />
-          <p>{userRating ? `This movie is rated ${userRating}` : ""}</p>
-          {/* Button to add movie to watched list */}
           {!isWatched ? (
-            <button className="btn-add" onClick={() => handleAddMovie()}>
-              {" "}
-              + Add To List
-            </button>
+            <>
+              <StarRating
+                maxRating={10}
+                size={21}
+                defaultRating={0}
+                onSetRating={setUserRating}
+              />
+              <p>{userRating ? `This movie is rated ${userRating}` : ""}</p>
+
+              {/* Button to add movie to watched list */}
+              <button className="btn-add" onClick={() => handleAddMovie()}>
+                {" "}
+                + Add To List
+              </button>
+            </>
           ) : (
-            <button className="btn-add" disabled>
-              Already Added
-            </button>
+            <p>You rated movie {selectedMovieUserRating} </p>
           )}
         </div>
         <p>
