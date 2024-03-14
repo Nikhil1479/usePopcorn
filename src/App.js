@@ -59,7 +59,7 @@ export default function App() {
 
         const res = await fetch(
           // Fetch movie data from OMDB API
-          `https://www.omdbapi.com/?s=${query}&apikey=${APIKEY}`,
+          `https://www.omdbapi.com/?s=${query.trim()}&apikey=${APIKEY}`,
           { signal: controller.signal }
         );
         const data = await res.json(); // Parse response to JSON
