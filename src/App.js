@@ -1,7 +1,5 @@
 // Importing Necessary Libraries
 import { useEffect, useState } from "react"; // Importing React hooks for component lifecycle management
-import { tempMovieData } from "./MovieData"; // Importing temporary movie data
-import { tempWatchedData } from "./MovieData"; // Importing temporary watched movie data
 import StarRating from "./StarRating"; // Importing StarRating component
 
 // Importing Font Awesmome React Component
