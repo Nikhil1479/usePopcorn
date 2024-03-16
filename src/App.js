@@ -21,14 +21,15 @@ const APIKEY = "8c757fb"; // API key for OMDB API
 // Exporting default function component named App
 export default function App() {
   // useState hooks for managing component state
-  const [movies, setMovies] = useState(tempMovieData); // State for storing movie data
+  const [movies, setMovies] = useState([]); // State for storing movie data
   const [isLoading, setIsLoading] = useState(false); // State for loading status
   const [error, setError] = useState(null); // State for error handling
   const [query, setQuery] = useState(""); // State for search query
   const [selectedMovie, setSelectedMovie] = useState(null); // State for selected movie details
+
   const [watched, setWatched] = useState(function () {
     const browserData = localStorage.getItem("watched");
-    return JSON.parse(browserData);
+    return JSON.parse(browserData) || [];
   }); // State for storing watched movies
 
   // Function to close selected movie details
@@ -81,7 +82,6 @@ export default function App() {
         }
 
         setMovies(data.Search); // Set fetched movies to state
-        setWatched(tempWatchedData); // Reset watched movies data
         setIsLoading(false); // Set loading status to false
       } catch (err) {
         if (err.message === "Failed to fetch") {
