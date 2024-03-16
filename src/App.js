@@ -22,11 +22,14 @@ const APIKEY = "8c757fb"; // API key for OMDB API
 export default function App() {
   // useState hooks for managing component state
   const [movies, setMovies] = useState(tempMovieData); // State for storing movie data
-  const [watched, setWatched] = useState(tempWatchedData); // State for storing watched movies
   const [isLoading, setIsLoading] = useState(false); // State for loading status
   const [error, setError] = useState(null); // State for error handling
   const [query, setQuery] = useState(""); // State for search query
   const [selectedMovie, setSelectedMovie] = useState(null); // State for selected movie details
+  const [watched, setWatched] = useState(function () {
+    const browserData = localStorage.getItem("watched");
+    return JSON.parse(browserData);
+  }); // State for storing watched movies
 
   // Function to close selected movie details
   function handleClosebtn() {
@@ -47,6 +50,14 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
+
+  // Storing the Watched movie data in browser local storage
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
 
   // Fetching Movie Data using useEffect hook
   useEffect(() => {
@@ -165,7 +176,7 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
   // useState hook for managing component state
   const [movieDetail, setMovieDetail] = useState({}); // State for movie details
   const [userRating, setUserRating] = useState(0); // State for user rating
-
+  const [isLoading, setIsLoading] = useState(false); // State for handle loading
   // Destructuring movieDetail object
   const {
     Title: title,
@@ -207,6 +218,7 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
     // Async function to fetch movie details
     async function fetchMovieDetails() {
       try {
+        setIsLoading(true);
         const res = await fetch(
           // Fetch movie details from OMDB API
           `https://www.omdbapi.com/?i=${selectedID}&apikey=${APIKEY}`
@@ -214,8 +226,11 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
         const data = await res.json(); // Parse response to JSON
         console.log(data);
         setMovieDetail(data); // Set fetched movie details to state
+        setIsLoading(true);
       } catch (e) {
         console.log(e.message);
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchMovieDetails(); // Call fetchMovieDetails function
@@ -290,7 +305,11 @@ onClosebtn function changes. */
               <p>{userRating ? `This movie is rated ${userRating}` : ""}</p>
 
               {/* Button to add movie to watched list */}
-              <button className="btn-add" onClick={() => handleAddMovie()}>
+              <button
+                className={isLoading ? "btn-add-loading" : "btn-add"}
+                disabled={isLoading}
+                onClick={() => handleAddMovie()}
+              >
                 {" "}
                 + Add To List
               </button>
