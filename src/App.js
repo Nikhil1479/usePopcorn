@@ -22,11 +22,14 @@ const APIKEY = "8c757fb"; // API key for OMDB API
 export default function App() {
   // useState hooks for managing component state
   const [movies, setMovies] = useState(tempMovieData); // State for storing movie data
-  const [watched, setWatched] = useState(tempWatchedData); // State for storing watched movies
   const [isLoading, setIsLoading] = useState(false); // State for loading status
   const [error, setError] = useState(null); // State for error handling
   const [query, setQuery] = useState(""); // State for search query
   const [selectedMovie, setSelectedMovie] = useState(null); // State for selected movie details
+  const [watched, setWatched] = useState(function () {
+    const browserData = localStorage.getItem("watched");
+    return JSON.parse(browserData);
+  }); // State for storing watched movies
 
   // Function to close selected movie details
   function handleClosebtn() {
@@ -41,18 +44,20 @@ export default function App() {
   // Function to handle adding a new movie to the watched list
   function handleAddMovie(newMovie) {
     setWatched((watched) => [...watched, newMovie]);
-
-    /* The above code is using JavaScript to add a new movie (stored in the variable `newMovie`) to an
-    array called `watched`, and then storing the updated array in the browser's `localStorage` under
-    the key "watched". The spread operator `...` is used to create a new array with the existing
-    movies in `watched` along with the new movie `newMovie`. */
-    localStorage.setItem("watched", [...watched, newMovie]);
   }
 
   // Function to handle deleting a movie from watched list
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
+
+  // Storing the Watched movie data in browser local storage
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
 
   // Fetching Movie Data using useEffect hook
   useEffect(() => {
