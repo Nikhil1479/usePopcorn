@@ -41,6 +41,12 @@ export default function App() {
   // Function to handle adding a new movie to the watched list
   function handleAddMovie(newMovie) {
     setWatched((watched) => [...watched, newMovie]);
+
+    /* The above code is using JavaScript to add a new movie (stored in the variable `newMovie`) to an
+    array called `watched`, and then storing the updated array in the browser's `localStorage` under
+    the key "watched". The spread operator `...` is used to create a new array with the existing
+    movies in `watched` along with the new movie `newMovie`. */
+    localStorage.setItem("watched", [...watched, newMovie]);
   }
 
   // Function to handle deleting a movie from watched list
@@ -165,7 +171,7 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
   // useState hook for managing component state
   const [movieDetail, setMovieDetail] = useState({}); // State for movie details
   const [userRating, setUserRating] = useState(0); // State for user rating
-
+  const [isLoading, setIsLoading] = useState(false); // State for handle loading
   // Destructuring movieDetail object
   const {
     Title: title,
@@ -207,6 +213,7 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
     // Async function to fetch movie details
     async function fetchMovieDetails() {
       try {
+        setIsLoading(true);
         const res = await fetch(
           // Fetch movie details from OMDB API
           `https://www.omdbapi.com/?i=${selectedID}&apikey=${APIKEY}`
@@ -214,8 +221,11 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
         const data = await res.json(); // Parse response to JSON
         console.log(data);
         setMovieDetail(data); // Set fetched movie details to state
+        setIsLoading(true);
       } catch (e) {
         console.log(e.message);
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchMovieDetails(); // Call fetchMovieDetails function
@@ -290,7 +300,11 @@ onClosebtn function changes. */
               <p>{userRating ? `This movie is rated ${userRating}` : ""}</p>
 
               {/* Button to add movie to watched list */}
-              <button className="btn-add" onClick={() => handleAddMovie()}>
+              <button
+                className={isLoading ? "btn-add-loading" : "btn-add"}
+                disabled={isLoading}
+                onClick={() => handleAddMovie()}
+              >
                 {" "}
                 + Add To List
               </button>

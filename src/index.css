@@ -8,6 +8,7 @@
   --color-background-900: #212529;
   --color-red: #fa5252;
   --color-red-dark: #e03131;
+  --color-grey: #868e96;
 }
 
 ::-webkit-scrollbar {
@@ -340,6 +341,19 @@ body {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
+}
+.btn-add-loading {
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  border: none;
+  border-radius: 10rem;
+  font-size: 1.4rem;
+  padding: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-add:hover {
