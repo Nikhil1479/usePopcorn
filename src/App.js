@@ -1,5 +1,5 @@
 // Importing Necessary Libraries
-import { useEffect, useState } from "react"; // Importing React hooks for component lifecycle management
+import { useEffect, useRef, useState } from "react"; // Importing React hooks for component lifecycle management
 import StarRating from "./StarRating"; // Importing StarRating component
 
 // Importing Font Awesmome React Component
@@ -514,6 +514,12 @@ function NumResults({ movies }) {
 
 // Function component for rendering search input
 function Search({ query, setQuery }) {
+  const inputEle = useRef(null);
+
+  useEffect(function () {
+    inputEle.current.focus();
+  }, []);
+
   // JSX structure for rendering Search component
   return (
     <input
@@ -522,6 +528,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEle}
     />
   );
 }
