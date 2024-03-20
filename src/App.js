@@ -516,9 +516,29 @@ function NumResults({ movies }) {
 function Search({ query, setQuery }) {
   const inputEle = useRef(null);
 
-  useEffect(function () {
-    inputEle.current.focus();
-  }, []);
+  /* The below code is a React useEffect hook that adds an event listener for keydown events on the
+  document. When a keydown event occurs, it checks if the active element is not the input element
+  referenced by `inputEle.current`. If the key pressed is "Enter", it focuses on the input element
+  and sets the query state to an empty string using the `setQuery` function. The useEffect hook also
+  returns a cleanup function that removes the event listener when the component unmounts or when the
+  dependencies specified in the dependency array change. */
+  useEffect(
+    function () {
+      function callback(e) {
+        if (document.activeElement === inputEle.current) {
+          return;
+        }
+        if (e.code === "Enter") {
+          inputEle.current.focus();
+          setQuery("");
+        }
+      }
+      document.addEventListener("keydown", callback);
+
+      return () => document.removeEventListener("keydown", callback);
+    },
+    [setQuery]
+  );
 
   // JSX structure for rendering Search component
   return (
