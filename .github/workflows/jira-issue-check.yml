@@ -1,54 +1,36 @@
 name: Jira Issue Check
 
 on:
-  pull_request:
-    types: [opened, reopened, synchronize]
+  push:
+    branches:
+      - main  # Adjust the branch name if necessary
 
 jobs:
   check-jira-issue:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-      
-    - name: Set up Git
-      run: |
-        git config --global user.name "${{ github.actor }}"
-        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-      
-    - name: Check for Jira issue key
-      run: |
-        #!/bin/bash
-        
-        # Define regular expression to match Jira issue keys
-        JIRA_REGEX='PAR-[0-9]+'
-        
-        # Function to check for Jira issue keys in commit messages or PR title
-        check_jira_issue() {
-            # Loop through all commit messages and PR title
-            while read -r line; do
-                # Check if the line contains a valid Jira issue key
-                if [[ $line =~ $JIRA_REGEX ]]; then
-                    echo "Found Jira issue key: ${BASH_REMATCH[0]}"
-                    return 0
-                fi
-            done < <(git log --format=%s "$1")
-            
-            # If no issue key found, return failure
-            echo "No Jira issue key found in commit messages or PR title"
-            return 1
-        }
-        
-        # Check for Jira issue keys in commit messages
-        if ! check_jira_issue HEAD; then
-            exit 1
-        fi
-        
-        # Check for Jira issue keys in PR title
-        if ! check_jira_issue FETCH_HEAD; then
-            exit 1
-        fi
-        
-        # If all checks pass, exit successfully
-        exit 0
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check for Jira issue key
+        run: |
+          #!/bin/bash
+          
+          # Define regular expression to match Jira issue keys
+          JIRA_REGEX='PAR-[0-9]+'
+          
+          # Function to check for Jira issue keys in commit messages
+          check_jira_issue() {
+              # Loop through all commit messages
+              while read -r line; do
+                  # Check if the line contains a valid Jira issue key
+                  if ! [[ $line =~ $JIRA_REGEX ]]; then
+                      echo "Error: Commit message must include a Jira issue key (e.g., PAR-123)."
+                      exit 1
+                  fi
+              done < <(git log --format=%s "$GITHUB_SHA" ^$GITHUB_SHA^)
+          }
+          
+          # Check for Jira issue keys in commit messages
+          check_jira_issue
