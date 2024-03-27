@@ -1,9 +1,7 @@
 name: Jira Issue Check
 
 on:
-  push:
-    branches:
-      - main  # Adjust the branch name if necessary
+  push: {}
 
 jobs:
   check-jira-issue:
