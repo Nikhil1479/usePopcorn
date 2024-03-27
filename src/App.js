@@ -175,6 +175,17 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
   const [movieDetail, setMovieDetail] = useState({}); // State for movie details
   const [userRating, setUserRating] = useState(0); // State for user rating
   const [isLoading, setIsLoading] = useState(false); // State for handle loading
+
+  const countRatingRef = useRef(0);
+
+  useEffect(
+    function () {
+      if (userRating) {
+        countRatingRef.current++;
+      }
+    },
+    [userRating]
+  );
   // Destructuring movieDetail object
   const {
     Title: title,
@@ -197,6 +208,7 @@ function MovieDetails({ selectedID, onClosebtn, onAddMovie, watched }) {
       runtime: Number(runtime.split(" ")[0]),
       imdbRating,
       userRating: userRating,
+      ratingCount: countRatingRef.current,
     };
     console.log(newMovie);
     onAddMovie(newMovie); // Call onAddMovie function to add movie to watched list
