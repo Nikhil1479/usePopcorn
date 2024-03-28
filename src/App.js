@@ -570,3 +570,4 @@ function Navbar({ children }) {
   // JSX structure for rendering Navbar component
   return <nav className="nav-bar">{children}</nav>;
 }
+//Test
