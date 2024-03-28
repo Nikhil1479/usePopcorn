@@ -52,3 +52,22 @@ jobs:
         
         # If all checks pass, exit successfully
         exit 0
+    
+    - name: Set status
+      uses: actions/github-script@v4
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { context, github } = require('@actions/github');
+          
+          const state = 'success'; // or 'failure' depending on the check result
+          const description = 'Jira issue check passed'; // or appropriate message
+          
+          github.repos.createCommitStatus({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            sha: context.sha,
+            state,
+            context: 'Jira Issue Check',
+            description
+          });
