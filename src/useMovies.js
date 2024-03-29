@@ -56,7 +56,8 @@ export function useMovies(query, callback) {
     return function () {
       controller.abort();
     };
-  }, [query, callback]); // useEffect dependency on query state
 
+  }, [query, callback]); // useEffect dependency on query state
+  
   return [movies, isLoading, error];
 }
