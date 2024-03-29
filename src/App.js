@@ -12,16 +12,14 @@ import { library } from "@fortawesome/fontawesome-svg-core"; // Importing librar
 import { fab } from "@fortawesome/free-brands-svg-icons"; // Importing FontAwesome brands icons
 import { fas } from "@fortawesome/free-solid-svg-icons"; // Importing FontAwesome solid icons
 import { far } from "@fortawesome/free-regular-svg-icons"; // Importing FontAwesome regular icons
+import { useMovies } from "./useMovies";
 library.add(fab, fas, far); // Adding imported icons to the library
 
 const APIKEY = "8c757fb"; // API key for OMDB API
-
 // Exporting default function component named App
 export default function App() {
   // useState hooks for managing component state
-  const [movies, setMovies] = useState([]); // State for storing movie data
-  const [isLoading, setIsLoading] = useState(false); // State for loading status
-  const [error, setError] = useState(null); // State for error handling
+
   const [query, setQuery] = useState(""); // State for search query
   const [selectedMovie, setSelectedMovie] = useState(null); // State for selected movie details
 
@@ -58,55 +56,11 @@ export default function App() {
     [watched]
   );
 
-  // Fetching Movie Data using useEffect hook
-  useEffect(() => {
-    const controller = new AbortController();
-    // Async function to fetch movies
-    async function fetchMovies() {
-      try {
-        setIsLoading(true); // Set loading status to true
-        setError(null); // Clear any previous error
-
-        const res = await fetch(
-          // Fetch movie data from OMDB API
-          `https://www.omdbapi.com/?s=${query.trim()}&apikey=${APIKEY}`,
-          { signal: controller.signal }
-        );
-        const data = await res.json(); // Parse response to JSON
-        // console.log(data);
-        //
-        if (data.Response === "False") {
-          throw new Error(data.Error); // Throw error if response is false
-        }
-
-        setMovies(data.Search); // Set fetched movies to state
-        setIsLoading(false); // Set loading status to false
-      } catch (err) {
-        if (err.message === "Failed to fetch") {
-          setError("Something Went Wrong..."); // Set error message for failed fetch
-          // console.error(err.message);
-        } else if (err.name === "AbortError") {
-          console.log("User Aborted"); // Ignoring the Abort Error
-        } else {
-          setError(err.message); // Set error message for other errors
-        }
-      } finally {
-        setIsLoading(false); // Set loading status to false
-        // setError(null);
-      }
-    }
-    if (query.length < 3) {
-      setMovies([]); // Clear movies data if query length is less than 3
-      setError(null); // Clear any previous error
-      return;
-    }
-    handleClosebtn();
-    fetchMovies(); // Call fetchMovies function
-
-    return function () {
-      controller.abort();
-    };
-  }, [query]); // useEffect dependency on query state
+  /* The code snippet is using a custom hook `useMovies` to fetch movies based on a `query` and handle
+closing of a button (`handleClosebtn`). It returns an array with three elements: `movies` (the
+fetched movies), `isLoading` (a boolean indicating if the data is still loading), and `error` (any
+error that occurred during the fetch operation). */
+  const [movies, isLoading, error] = useMovies(query, handleClosebtn);
 
   // JSX structure for rendering App component
   return (
