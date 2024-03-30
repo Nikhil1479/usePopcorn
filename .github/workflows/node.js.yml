@@ -45,13 +45,14 @@ jobs:
         repository: ${{ github.repository }}
 
     - name: Send email
+      if: ${{ always() }}
       uses: dawidd6/action-send-mail@v3
       with:
         server_address: smtp.gmail.com
         server_port: 587
-        username: nikkhiilgupta@gmail.com
-        password: rgqp fwpy sjqp dfwq
-        subject: "CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${GITHUB_SHA})"
+        username: Build Status
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "${if eq(job.status, 'success') }} ✅ ${else}} ❌ ${endif} CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${SHORT_SHA})"
         to: nikhil956839@gmail.com
         from: nikkhiilgupta@gmail.com
         body: |
