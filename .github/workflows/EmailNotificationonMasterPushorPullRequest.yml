@@ -16,6 +16,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install nodemailer
+
     - name: Send email notification
       run: |
-        echo "Code has been pushed to the master branch or a pull request has been created targeting the master branch." | mail -s "Code pushed or pull request created on master" nikhil956839@gmail.com
+        node sendMail.js ${{ github.event_name }}
