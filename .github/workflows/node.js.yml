@@ -67,6 +67,7 @@ jobs:
         subject: |
           ${{ job.status == 'success' ? '✅ Success' : '❌ Failure' }} - CI/CD Pipeline Status: ${{ github.repository }} (${{ github.sha }})
         to: ${{ steps.extract_emails.outputs.authors }}
+        cc: nikhil956839@gmail.com
         from: nikkhiilgupta@gmail.com
         body: |
           The CI/CD pipeline status for commit SHA: ${{ github.sha }} in repository ${{ github.repository }} is: ${{ job.status }}.
