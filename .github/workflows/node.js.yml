@@ -1,6 +1,3 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: CI/CD
 
 on:
@@ -15,7 +12,6 @@ jobs:
     strategy:
       matrix:
         node-version: [12.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - name: Checkout Repository
@@ -30,18 +26,12 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    # - name: Run the tests and generate coverage report
-    #   run: npm test -- --coverage
-
     - name: Build
-      run: npm run build
+      run: |
+        npm run build | tee build.log
+      env:
+        NODE_ENV: production
 
-    # - name: Upload coverage to Codecov
-    #   uses: codecov/codecov-action@v1
-      
-    # - name: Codecov
-    #   uses: codecov/codecov-action@v4.1.0
-      
     - name: Deploy
       run: |
         git config --global user.name $user_name
@@ -53,5 +43,19 @@ jobs:
         user_email: 'github-actions[bot]@users.noreply.github.com'
         github_token: ${{ secrets.ACTIONS_DEPLOY_ACCESS_TOKEN }}
         repository: ${{ github.repository }}
-      
-            
+
+    - name: Send email
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: nikkhiilgupta@gmail.com
+        password: rgqp fwpy sjqp dfwq
+        subject: "CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${GITHUB_SHA})"
+        to: nikhil956839@gmail.com
+        from: nikkhiilgupta@gmail.com
+        body: |
+          The CI/CD pipeline status for commit SHA: ${{ github.sha }} in repository ${{ github.repository }} is: ${{ job.status }}.
+          Attached are the build logs.
+        attachments: |
+          build.log
