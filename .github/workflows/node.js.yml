@@ -47,7 +47,7 @@ jobs:
     - name: Extract Author Emails
       id: extract_emails
       run: |
-        AUTHORS=$(git log -2 --format='%ae')
+        AUTHORS=$(echo "${{ steps.get_contributors.outputs.data }}" | jq -r '.[].login' | xargs -I{} sh -c "curl -s 'https://api.github.com/users/{}/events/public' | jq -r 'map(select(.type == \"PushEvent\"))[0].payload.commits[].author.email'")
         echo "::set-output name=authors::$AUTHORS"
       
     - name: Send Success Email
