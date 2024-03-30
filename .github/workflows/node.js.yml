@@ -43,7 +43,13 @@ jobs:
         user_email: 'github-actions[bot]@users.noreply.github.com'
         github_token: ${{ secrets.ACTIONS_DEPLOY_ACCESS_TOKEN }}
         repository: ${{ github.repository }}
-
+        
+    - name: Extract Author Emails
+      id: extract_emails
+      run: |
+        AUTHORS=$(git log -2 --format='%ae')
+        echo "::set-output name=authors::$AUTHORS"
+      
     - name: Send Success Email
       if: ${{ always() && success() }}
       uses: dawidd6/action-send-mail@v3
@@ -53,7 +59,7 @@ jobs:
         username: nikkhiilgupta@gmail.com
         password: ${{ secrets.EMAIL_PASSWORD }}
         subject: "✅ CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${{ github.sha }})"
-        to: nikhil956839@gmail.com
+        to: ${{ steps.extract_emails.outputs.authors }}
         from: nikkhiilgupta@gmail.com
         body: |
           The CI/CD pipeline status for commit SHA: ${{ github.sha }} in repository ${{ github.repository }} is: ${{ job.status }}.
@@ -70,7 +76,7 @@ jobs:
         username: nikkhiilgupta@gmail.com
         password: ${{ secrets.EMAIL_PASSWORD }}
         subject: "❌ CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${{ github.sha }})"
-        to: nikhil956839@gmail.com
+        to: ${{ steps.extract_emails.outputs.authors }}
         from: nikkhiilgupta@gmail.com
         body: |
           The CI/CD pipeline status for commit SHA: ${{ github.sha }} in repository ${{ github.repository }} is: ${{ job.status }}.
