@@ -52,7 +52,7 @@ jobs:
         server_port: 587
         username: nikkhiilgupta@gmail.com
         password: rgqp fwpy sjqp dfwq
-        subject: "${if eq(job.status, 'success') }} ✅ ${else}} ❌ ${endif} CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${SHORT_SHA})"
+        subject: "${{ if eq(job.status, 'success') }} ✅ ${{ else }} ❌ ${{ endif }} CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${SHORT_SHA})"
         to: nikhil956839@gmail.com
         from: nikkhiilgupta@gmail.com
         body: |
