@@ -33,8 +33,9 @@ jobs:
       with:
         node-version: '14'
 
-    - name: Install dependencies for email notification
-      run: npm install nodemailer
+
+    # - name: Install dependencies
+    #   run: npm install nodemailer
 
     - name: Send email notification
       run: |
