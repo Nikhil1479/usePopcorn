@@ -6,7 +6,7 @@ async function sendEmail() {
       service: "gmail",
       auth: {
         user: "nikkhiilgupta@gmail.com", // Your email
-        pass: "Niks1479@", // Your App Password
+        pass: "rgqp fwpy sjqp dfwq", // Your App Password
       },
     });
 
