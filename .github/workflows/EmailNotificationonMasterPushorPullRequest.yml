@@ -1,0 +1,21 @@
+name: Email Notification on Master Push or Pull Request
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  send_email_notification:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Send email notification
+      run: |
+        echo "Code has been pushed to the master branch or a pull request has been created targeting the master branch." | mail -s "Code pushed or pull request created on master" nikhil956839@gmail.com
