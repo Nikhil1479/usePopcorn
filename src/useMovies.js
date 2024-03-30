@@ -33,7 +33,7 @@ export function useMovies(query, callback) {
         setIsLoading(false); // Set loading status to false
       } catch (err) {
         if (err.message === "Failed to fetch") {
-          setError("Something Went Wrong..."); // Set error message for failed fetch
+          setError("Something Went Wrongm..."); // Set error message for failed fetch
           // console.error(err.message);
         } else if (err.name === "AbortError") {
           console.log("User Aborted"); // Ignoring the Abort Error
