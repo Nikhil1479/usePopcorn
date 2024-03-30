@@ -509,4 +509,4 @@ function Navbar({ children }) {
   // JSX structure for rendering Navbar component
   return <nav className="nav-bar">{children}</nav>;
 }
-// # test commmit to master
+const unusedVar = "null";
