@@ -43,29 +43,39 @@ jobs:
         user_email: 'github-actions[bot]@users.noreply.github.com'
         github_token: ${{ secrets.ACTIONS_DEPLOY_ACCESS_TOKEN }}
         repository: ${{ github.repository }}
-
-    - name: Get Contributors
-      id: get_contributors
-      uses: octokit/request-action@v2.x
-      with:
-        route: GET /repos/:owner/:repo/contributors
-
+        
     - name: Extract Author Emails
       id: extract_emails
       run: |
-        AUTHORS=$(echo "${{ steps.get_contributors.outputs.data }}" | jq -r '.[].login' | xargs -I{} sh -c "curl -s 'https://api.github.com/users/{}/events/public' | jq -r 'map(select(.type == \"PushEvent\"))[0].payload.commits[].author.email'")
+        AUTHORS=$(git log -2 --format='%ae')
         echo "::set-output name=authors::$AUTHORS"
-
-    - name: Send Email Notification
-      if: always()
+      
+    - name: Send Success Email
+      if: ${{ always() && success() }}
       uses: dawidd6/action-send-mail@v3
       with:
         server_address: smtp.gmail.com
         server_port: 587
         username: nikkhiilgupta@gmail.com
         password: ${{ secrets.EMAIL_PASSWORD }}
-        subject: |
-          ${{ job.status == 'success' ? '✅ Success' : '❌ Failure' }} - CI/CD Pipeline Status: ${{ github.repository }} (${{ github.sha }})
+        subject: "✅ CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${{ github.sha }})"
+        to: ${{ steps.extract_emails.outputs.authors }}
+        cc: nikhil956839@gmail.com
+        from: nikkhiilgupta@gmail.com
+        body: |
+          The CI/CD pipeline status for commit SHA: ${{ github.sha }} in repository ${{ github.repository }} is: ${{ job.status }}.
+          Attached are the build logs.
+        attachments: |
+          build.log
+    - name: Send Failure Email
+      if: ${{ always() && failure() }}
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: nikkhiilgupta@gmail.com
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "❌ CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${{ github.sha }})"
         to: ${{ steps.extract_emails.outputs.authors }}
         cc: nikhil956839@gmail.com
         from: nikkhiilgupta@gmail.com
