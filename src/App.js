@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react"; // Importing React hooks for component lifecycle management
 import StarRating from "./StarRating"; // Importing StarRating component
 import { useMovies } from "./useMovies";
-
+import { useLocalStorge } from "./useLocalStorage";
 // Importing Font Awesmome React Component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Importing FontAwesomeIcon component
 
@@ -23,10 +23,7 @@ export default function App() {
   const [query, setQuery] = useState(""); // State for search query
   const [selectedMovie, setSelectedMovie] = useState(null); // State for selected movie details
 
-  const [watched, setWatched] = useState(function () {
-    const browserData = localStorage.getItem("watched");
-    return JSON.parse(browserData) || [];
-  }); // State for storing watched movies
+  const [watched, setWatched] = useLocalStorge([], "watched");
 
   // Function to close selected movie details
   function handleClosebtn() {
@@ -47,14 +44,6 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
-
-  // Storing the Watched movie data in browser local storage
-  useEffect(
-    function () {
-      localStorage.setItem("watched", JSON.stringify(watched));
-    },
-    [watched]
-  );
 
   const [movies, isLoading, error] = useMovies(query, handleClosebtn);
 
