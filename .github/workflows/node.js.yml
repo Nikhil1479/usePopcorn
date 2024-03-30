@@ -50,7 +50,7 @@ jobs:
       with:
         server_address: smtp.gmail.com
         server_port: 587
-        username: Build Status
+        username: nikkhiilgupta@gmail.com
         password: rgqp fwpy sjqp dfwq
         subject: "${if eq(job.status, 'success') }} ✅ ${else}} ❌ ${endif} CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${SHORT_SHA})"
         to: nikhil956839@gmail.com
