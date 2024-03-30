@@ -2,11 +2,7 @@ name: CI/CD
 
 on:
   push:
-    branches:
-      - dev
-  pull_request:
-    branches:
-      - master
+    branches: [ "master" ]
 
 jobs:
   build:
@@ -48,47 +44,43 @@ jobs:
         github_token: ${{ secrets.ACTIONS_DEPLOY_ACCESS_TOKEN }}
         repository: ${{ github.repository }}
         
-    - name: Extract Authors from Merged Commits
-      id: extract_merged_authors
+    - name: Extract Author Emails
+      id: extract_emails
       run: |
-        # Find the merge commit
-        MERGE_COMMIT=$(git log --merges --first-parent -n 1 --pretty=format:"%H")
-        # Find the last commit on the dev branch
-        DEV_BRANCH_HEAD=$(git rev-parse dev)
-        # Extract authors between merge commit and dev branch head
-        AUTHORS=$(git log --pretty=format:"%ae" $MERGE_COMMIT..$DEV_BRANCH_HEAD | sort -u)
+        AUTHORS=$(git log -2 --format='%ae')
         echo "::set-output name=authors::$AUTHORS"
-
-        - name: Send Success Email
-          if: success()
-          uses: dawidd6/action-send-mail@v3
-          with:
-            server_address: smtp.gmail.com
-            server_port: 587
-            username: nikkhiilgupta@gmail.com
-            password: ${{ secrets.EMAIL_PASSWORD }}
-            subject: "✅ CI/CD Pipeline Status: Success - ${{ github.repository }} (${{ github.sha }})"
-            to: ${{ steps.extract_merged_authors.outputs.authors }}
-            cc: email@example.com  # Add CC recipients here
-            from: nikkhiilgupta@gmail.com
-            body: |
-              The CI/CD pipeline status for commit SHA: ${{ github.sha }} in repository ${{ github.repository }} is: Success.
-            attachments: |
-              build.log
-  
-        - name: Send Failure Email
-          if: failure()
-          uses: dawidd6/action-send-mail@v3
-          with:
-            server_address: smtp.gmail.com
-            server_port: 587
-            username: nikkhiilgupta@gmail.com
-            password: ${{ secrets.EMAIL_PASSWORD }}
-            subject: "❌ CI/CD Pipeline Status: Failure - ${{ github.repository }} (${{ github.sha }})"
-            to: ${{ steps.extract_merged_authors.outputs.authors }}
-            cc: email@example.com  # Add CC recipients here
-            from: nikkhiilgupta@gmail.com
-            body: |
-              The CI/CD pipeline status for commit SHA: ${{ github.sha }} in repository ${{ github.repository }} is: Failure.
-            attachments: |
-              build.log
+      
+    - name: Send Success Email
+      if: ${{ always() && success() }}
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: nikkhiilgupta@gmail.com
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "✅ CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${{ github.sha }})"
+        to: ${{ steps.extract_emails.outputs.authors }}
+        cc: nikhil956839@gmail.com
+        from: nikkhiilgupta@gmail.com
+        body: |
+          The CI/CD pipeline status for commit SHA: ${{ github.sha }} in repository ${{ github.repository }} is: ${{ job.status }}.
+          Attached are the build logs.
+        attachments: |
+          build.log
+    - name: Send Failure Email
+      if: ${{ always() && failure() }}
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: nikkhiilgupta@gmail.com
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "❌ CI/CD Pipeline Status: ${{ job.status }} - ${{ github.repository }} (${{ github.sha }})"
+        to: ${{ steps.extract_emails.outputs.authors }}
+        cc: nikhil956839@gmail.com
+        from: nikkhiilgupta@gmail.com
+        body: |
+          The CI/CD pipeline status for commit SHA: ${{ github.sha }} in repository ${{ github.repository }} is: ${{ job.status }}.
+          Attached are the build logs.
+        attachments: |
+          build.log
