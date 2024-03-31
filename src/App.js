@@ -45,7 +45,7 @@ export default function App() {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
 
-  const [movies, isLoading, error] = useMovies(query, handleClosebtn);
+  const [movies, isLoading, error] = useMovies(query);
 
   // JSX structure for rendering App component
   return (

@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 
 const APIKEY = "8c757fb"; // API key for OMDB API
 
-export function useMovies(query, callback) {
+export function useMovies(query) {
   const [movies, setMovies] = useState([]); // State for storing movie data
   const [isLoading, setIsLoading] = useState(false); // State for loading status
   const [error, setError] = useState(null); // State for error handling
 
   // Fetching Movie Data using useEffect hook
   useEffect(() => {
-    callback?.();
+    // callback?.();
     const controller = new AbortController();
     // Async function to fetch movies
     async function fetchMovies() {
@@ -56,8 +56,7 @@ export function useMovies(query, callback) {
     return function () {
       controller.abort();
     };
+  }, [query]); // useEffect dependency on query state
 
-  }, [query, callback]); // useEffect dependency on query state
-  
   return [movies, isLoading, error];
 }
