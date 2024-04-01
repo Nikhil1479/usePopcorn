@@ -10,9 +10,14 @@ onClosebtn function changes. */
     function callback(e) {
       if (e.code.toLowerCase() === key.toLowerCase()) {
         action();
-        console.log("closing");
+        console.log("key pressed: ", key);
       } else {
-        console.log("not closing, different keydown");
+        console.log(
+          "key pressed: ",
+          e.code.toLowerCase(),
+          " not ",
+          key.toLowerCase()
+        );
       }
     }
     // Attaching Event Listener
